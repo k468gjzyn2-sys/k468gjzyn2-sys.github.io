@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>HUN Contacts — 스마트 연락처 변환기</title>
+<title>선생님 손가락 보호 구역 — 갈무리 아카데미</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
@@ -11,8 +11,9 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #F5F5F7; --surface: #FFFFFF; --surface2: #F5F5F7; --border: #E0E0E5;
-  --tx: #1D1D1F; --tx2: #6E6E73; --tx3: #AEAEB2; --accent: #0071E3;
-  --accent-bg: #EAF3FF; --green: #34C759; --green-bg: #EDFAF2;
+  --tx: #1D1D1F; --tx2: #6E6E73; --tx3: #AEAEB2;
+  --accent: #FF9E00; --accent-bg: #FFF7E6; --accent-dark: #E08800;
+  --green: #34C759; --green-bg: #EDFAF2;
   --radius: 18px; --radius-sm: 12px;
   --shadow: 0 2px 12px rgba(0,0,0,.07), 0 0 0 0.5px rgba(0,0,0,.06);
 }
@@ -25,25 +26,26 @@ body {
   color: var(--tx); -webkit-font-smoothing: antialiased;
 }
 
+/* ── Header ── */
 .header { text-align: center; margin-bottom: 40px; }
 .badge {
   display: inline-block; padding: 5px 14px; background: var(--tx); color: #fff;
   font-size: 10px; font-weight: 700; border-radius: 100px;
   margin-bottom: 16px; letter-spacing: 0.1em;
 }
-.title { font-size: 36px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 8px; }
+.title { font-size: 36px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 8px; line-height: 1.15; }
 .title span { color: var(--accent); }
 .desc {
   font-size: 15px; font-weight: 300; color: var(--tx2);
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-
 .sample-link {
   font-size: 12px; color: var(--accent); text-decoration: none;
   cursor: pointer; display: inline-flex; align-items: center; gap: 3px; transition: opacity .2s;
 }
 .sample-link:hover { opacity: 0.7; }
 
+/* ── Card / Drop zone ── */
 .wrap { width: 100%; max-width: 500px; }
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
 
@@ -103,17 +105,31 @@ body {
   white-space: nowrap; flex-shrink: 0;
 }
 .p-role.student { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); }
-.p-role.parent  { color: #8B5CF6; border-color: #C4B5FD; background: #F5F3FF; }
+.p-role.parent-f { color: #0071E3; border-color: #0071E3; background: #EAF3FF; }
+.p-role.parent-m { color: #8B5CF6; border-color: #C4B5FD; background: #F5F3FF; }
+
+/* ── Preview limit notice ── */
+.preview-notice {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--accent-bg);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: flex-start; gap: 8px;
+  text-align: left;
+}
+.preview-notice-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.preview-notice-text { font-size: 11px; color: var(--tx2); line-height: 1.6; }
+.preview-notice-text strong { color: var(--tx); font-weight: 600; }
 
 /* ── Button ── */
 .btn {
   display: inline-flex; align-items: center;
-  padding: 12px 28px; background: var(--tx); color: #fff;
-  border-radius: 100px; cursor: pointer; font-size: 14px; font-weight: 500;
-  border: none; transition: transform .2s, box-shadow .2s;
+  padding: 12px 28px; background: var(--accent); color: #fff;
+  border-radius: 100px; cursor: pointer; font-size: 14px; font-weight: 600;
+  border: none; transition: transform .2s, box-shadow .2s, background .2s;
   font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased;
 }
-.btn:hover  { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+.btn:hover  { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,158,0,.3); }
 .btn:active { transform: translateY(0); }
 .btn-ghost  {
   background: transparent; color: var(--tx2);
@@ -128,10 +144,10 @@ body {
 <body>
 
 <div class="header">
-  <div class="badge">HUN STUDIO</div>
-  <h1 class="title"><span>HUN</span> 연락처 변환기/h1>
+  <div class="badge">Only Galmuri</div>
+  <h1 class="title">선생님 손가락 <span>보호 구역</span></h1>
   <p class="desc">
-    연락처 파일을 드롭하여 변환하세요
+    수십 명의 번호, 일일이 치지 말고 드래그 한 번으로 저장하세요.
     <span style="color:var(--border)">|</span>
     <a class="sample-link" onclick="downloadSample(event)">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -150,8 +166,8 @@ body {
 
       <!-- IDLE -->
       <div id="view-idle">
-        <div style="font-size:17px;font-weight:600;margin-bottom:6px;letter-spacing:-0.02em;">파일을 선택하세요</div>
-        <div style="font-size:13px;color:var(--tx3);font-weight:300;">Excel 또는 CSV 형식 지원</div>
+        <div style="font-size:17px;font-weight:600;margin-bottom:6px;letter-spacing:-0.02em;">여기에 엑셀 파일을 놓아주세요</div>
+        <div style="font-size:13px;color:var(--tx3);font-weight:300;">모든 시트를 자동으로 통합하여 변환합니다.</div>
       </div>
 
       <!-- PROCESSING -->
@@ -165,7 +181,7 @@ body {
 
       <!-- DONE -->
       <div id="view-done" style="display:none;">
-        <div style="font-size:18px;font-weight:700;margin-bottom:4px;letter-spacing:-0.02em;">변환 완료</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px;letter-spacing:-0.02em;">변환 완료 🎉</div>
         <div id="done-filename" style="font-size:12px;color:var(--tx3);margin-bottom:16px;"></div>
 
         <div class="stats">
@@ -177,6 +193,13 @@ body {
         <div class="preview-area">
           <div class="preview-label">Data Preview</div>
           <div class="preview-list" id="preview-list"></div>
+          <div class="preview-notice">
+            <span class="preview-notice-icon">💡</span>
+            <span class="preview-notice-text">
+              미리보기는 <strong>최대 100개</strong>만 표시됩니다.<br>
+              <strong>가져오기 클릭 시 전체 인원이 정상 저장됩니다.</strong>
+            </span>
+          </div>
         </div>
 
         <button class="btn btn-ghost" onclick="toIdle()">새 파일 변환</button>
@@ -186,10 +209,12 @@ body {
 </div>
 
 <input type="file" id="fileInput" accept=".xlsx,.xls,.csv"/>
-<div class="foot">Only Galmuri</div>
+<div class="foot">DESIGNED BY HUN · 2026</div>
 
 <script>
-const COL = { name:'성명', school:'학교', student:'학생핸드폰', parent:'부모핸드폰' }
+const COL = { name:'성명', student:'학생핸드폰', dad:'부핸드폰', mom:'모핸드폰' }
+const PREVIEW_LIMIT = 100
+
 const dz        = document.getElementById('dz')
 const fileInput = document.getElementById('fileInput')
 let   state     = 'idle'
@@ -215,18 +240,18 @@ dz.addEventListener('drop', e => {
 dz.addEventListener('click', () => { if (state !== 'view-proc') fileInput.click() })
 fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); fileInput.value = '' })
 
-// ── 샘플 파일 ────────────────────────────────────────────────────────────
+// ── 샘플 파일 (새 컬럼명 반영) ──────────────────────────────────────────
 function downloadSample(e) {
   e.stopPropagation()
   const ws = XLSX.utils.aoa_to_sheet([
-    ['성명','학교','학생핸드폰','부모핸드폰'],
-    ['홍길동','갈무리중학교','010-1234-5678','010-1111-2222'],
-    ['김철수','갈무리고등학교','010-2222-3333','010-4444-5555'],
-    ['이영희','갈무리어학당','','010-6666-7777'],
+    ['성명', '학생핸드폰', '부핸드폰', '모핸드폰'],
+    ['홍길동', '010-1234-5678', '010-1111-2222', '010-3333-4444'],
+    ['김철수', '010-2222-3333', '010-5555-6666', ''],
+    ['이영희', '',              '',              '010-7777-8888'],
   ])
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Sample')
-  XLSX.writeFile(wb, 'HUN_Contact_Sample.xlsx')
+  XLSX.writeFile(wb, 'Galmuri_Contact_Sample.xlsx')
 }
 
 // ── 정규화 & vCard 빌드 ──────────────────────────────────────────────────
@@ -246,36 +271,57 @@ function buildCard(displayName, tel) {
   ].join('\r\n')
 }
 
-// ── 미리보기 ─────────────────────────────────────────────────────────────
-function addPreview(name, tel, role) {
+// ── 미리보기 (최대 PREVIEW_LIMIT개) ─────────────────────────────────────
+let previewCount = 0
+function addPreview(name, tel, role, roleClass) {
+  if (previewCount >= PREVIEW_LIMIT) return
+  previewCount++
   const div = document.createElement('div')
   div.className = 'preview-item'
-  const isStudent = role === '학생'
   div.innerHTML =
     `<span><span class="p-name">${name}</span><span class="p-tel">${tel}</span></span>` +
-    `<span class="p-role ${isStudent ? 'student' : 'parent'}">${role}</span>`
+    `<span class="p-role ${roleClass}">${role}</span>`
   document.getElementById('preview-list').appendChild(div)
 }
 
-// ── 파일 처리 ────────────────────────────────────────────────────────────
+// ── 파일 처리: 모든 시트 통합 ───────────────────────────────────────────
 function handleFile(file) {
   if (!file) return
   document.getElementById('preview-list').innerHTML = ''
+  previewCount = 0
   show('view-proc')
 
   const reader = new FileReader()
   reader.onload = e => {
     try {
-      const wb  = XLSX.read(new Uint8Array(e.target.result), { type:'array', codepage:65001 })
-      const all = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header:1, defval:'' })
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array', codepage:65001 })
 
-      let hi = all.findIndex(r => r.some(c => String(c).trim() === COL.name))
-      if (hi === -1) hi = 0
-      const headers  = all[hi].map(c => String(c).trim())
-      const dataRows = all.slice(hi + 1)
-      const base     = file.name.replace(/\.[^.]+$/, '')
+      // 모든 시트 데이터를 하나로 합침
+      let allRows = []
+      let sharedHeaders = null
+      wb.SheetNames.forEach(sheetName => {
+        const raw = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header:1, defval:'' })
+        let hi = raw.findIndex(r => r.some(c => String(c).trim() === COL.name))
+        if (hi === -1) return // 이 시트에 헤더 없으면 스킵
+        const headers  = raw[hi].map(c => String(c).trim())
+        const dataRows = raw.slice(hi + 1)
+        if (!sharedHeaders) sharedHeaders = headers
+        // 헤더가 다른 시트도 공통 컬럼 기준으로 맞춰 병합
+        dataRows.forEach(rawRow => {
+          const row = {}
+          headers.forEach((h, i) => { row[h] = String(rawRow[i] ?? '').trim() })
+          allRows.push(row)
+        })
+      })
 
-      processData(dataRows, headers, base)
+      if (!sharedHeaders || !allRows.length) {
+        show('view-idle')
+        alert('변환된 연락처가 없어요.\n"성명" 컬럼이 포함된 시트가 있는지 확인해주세요.')
+        return
+      }
+
+      const base = file.name.replace(/\.[^.]+$/, '')
+      processData(allRows, base)
     } catch(ex) {
       show('view-idle')
       alert('파일 파싱 오류: ' + ex.message)
@@ -285,11 +331,11 @@ function handleFile(file) {
 }
 
 // ── 청크 단위 처리 + 진행바 ─────────────────────────────────────────────
-function processData(dataRows, headers, base) {
+function processData(allRows, base) {
   const CHUNK = 30
   let idx = 0, sc = 0, pc = 0
   const cards = []
-  const total = dataRows.length || 1
+  const total = allRows.length || 1
 
   function setProgress(done) {
     const pct = Math.round((done / total) * 100)
@@ -298,22 +344,34 @@ function processData(dataRows, headers, base) {
   }
 
   function tick() {
-    const end = Math.min(idx + CHUNK, dataRows.length)
+    const end = Math.min(idx + CHUNK, allRows.length)
     while (idx < end) {
-      const raw = dataRows[idx++]
-      const row = {}
-      headers.forEach((h, i) => { row[h] = String(raw[i] ?? '').trim() })
-
+      const row  = allRows[idx++]
       const name = row[COL.name]
       const sp   = normTel(row[COL.student])
-      const pp   = normTel(row[COL.parent])
+      const dp   = normTel(row[COL.dad])
+      const mp   = normTel(row[COL.mom])
       if (!name) continue
 
-      if (sp) { cards.push(buildCard(name, sp));                        addPreview(name, sp, '학생');   sc++ }
-      if (pp) { cards.push(buildCard(name + ' 부모님', pp));            addPreview(name + ' 부모님', pp, '학부모'); pc++ }
+      if (sp) {
+        cards.push(buildCard(name, sp))
+        addPreview(name, sp, '학생', 'student')
+        sc++
+      }
+      if (dp) {
+        cards.push(buildCard(name + ' 부', dp))
+        addPreview(name + ' 부', dp, '부', 'parent-f')
+        pc++
+      }
+      if (mp) {
+        cards.push(buildCard(name + ' 모', mp))
+        addPreview(name + ' 모', mp, '모', 'parent-m')
+        pc++
+      }
       setProgress(idx)
     }
-    if (idx < dataRows.length) {
+
+    if (idx < allRows.length) {
       setTimeout(tick, 0)
     } else {
       setProgress(total)
@@ -329,20 +387,20 @@ function processData(dataRows, headers, base) {
 function finish(cards, sc, pc, base) {
   if (!cards.length) {
     show('view-idle')
-    alert('변환된 연락처가 없어요.\n성명 · 학생핸드폰 · 부모핸드폰 컬럼을 확인해주세요.')
+    alert('변환된 연락처가 없어요.\n성명 · 학생핸드폰 · 부핸드폰 · 모핸드폰 컬럼을 확인해주세요.')
     return
   }
 
   const blob = new Blob(['\uFEFF' + cards.join('\r\n\r\n')], { type:'text/vcard;charset=utf-8' })
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
-  a.href = url; a.download = base + '_HUN.vcf'; a.click()
+  a.href = url; a.download = base + '_갈무리.vcf'; a.click()
   URL.revokeObjectURL(url)
 
-  document.getElementById('stat-total').textContent   = sc + pc
-  document.getElementById('stat-student').textContent = sc
-  document.getElementById('stat-parent').textContent  = pc
-  document.getElementById('done-filename').textContent = base + '_HUN.vcf'
+  document.getElementById('stat-total').textContent    = sc + pc
+  document.getElementById('stat-student').textContent  = sc
+  document.getElementById('stat-parent').textContent   = pc
+  document.getElementById('done-filename').textContent = base + '_갈무리.vcf'
   show('view-done')
 }
 </script>
