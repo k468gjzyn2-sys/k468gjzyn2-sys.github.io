@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HUN Contacts — 스마트 연락처 변환기</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F5F5F7; --surface: #FFFFFF; --surface2: #F5F5F7; --border: #E0E0E5;
+  --tx: #1D1D1F; --tx2: #6E6E73; --tx3: #AEAEB2; --accent: #0071E3;
+  --accent-bg: #EAF3FF; --green: #34C759; --green-bg: #EDFAF2;
+  --radius: 18px; --radius-sm: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,.07), 0 0 0 0.5px rgba(0,0,0,.06);
+}
+
+html, body { height: 100%; background: var(--bg); }
+body {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px; font-family: 'Noto Sans KR', sans-serif;
+  color: var(--tx); -webkit-font-smoothing: antialiased;
+}
+
+.header { text-align: center; margin-bottom: 40px; }
+.badge {
+  display: inline-block; padding: 5px 14px; background: var(--tx); color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: 100px;
+  margin-bottom: 16px; letter-spacing: 0.1em;
+}
+.title { font-size: 36px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 8px; }
+.title span { color: var(--accent); }
+.desc {
+  font-size: 15px; font-weight: 300; color: var(--tx2);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.sample-link {
+  font-size: 12px; color: var(--accent); text-decoration: none;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 3px; transition: opacity .2s;
+}
+.sample-link:hover { opacity: 0.7; }
+
+.wrap { width: 100%; max-width: 500px; }
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+
+.dz {
+  position: relative; padding: 60px 30px; text-align: center;
+  cursor: pointer; transition: background .25s ease; user-select: none;
+}
+.dz:hover { background: #FAFAFA; }
+.dz.drag  { background: var(--accent-bg); cursor: copy; }
+.dz.proc  { cursor: default; pointer-events: none; }
+
+.dz-border {
+  position: absolute; inset: 12px;
+  border: 1.5px dashed var(--border);
+  border-radius: calc(var(--radius) - 6px);
+  pointer-events: none; transition: border-color .25s, opacity .25s; opacity: 0;
+}
+.dz:hover .dz-border { opacity: 1; }
+.dz.drag  .dz-border { opacity: 1; border-color: var(--accent); }
+
+/* ── Progress ── */
+.prog-container { width: 100%; max-width: 260px; margin: 0 auto; }
+.prog-track {
+  width: 100%; height: 4px; background: var(--border);
+  border-radius: 100px; overflow: hidden; margin-top: 15px;
+}
+.prog-fill { height: 100%; background: var(--accent); width: 0%; transition: width .15s ease; }
+.prog-count { font-size: 12px; color: var(--tx3); margin-top: 8px; font-weight: 300; }
+
+/* ── Stats ── */
+.stats { display: flex; gap: 8px; margin: 20px 0; }
+.stat { background: var(--surface2); padding: 12px; border-radius: var(--radius-sm); flex: 1; text-align: center; }
+.stat-n { font-size: 22px; font-weight: 700; color: var(--tx); letter-spacing: -0.03em; }
+.stat-l { font-size: 10px; color: var(--tx3); margin-top: 2px; }
+
+/* ── Preview ── */
+.preview-area { margin-top: 24px; text-align: left; }
+.preview-label {
+  font-size: 11px; font-weight: 700; color: var(--tx3);
+  margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em;
+}
+.preview-list {
+  background: var(--surface2); border-radius: var(--radius-sm);
+  max-height: 160px; overflow-y: auto;
+  border: 1px solid rgba(0,0,0,.03);
+}
+.preview-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 13px;
+}
+.preview-item:last-child { border-bottom: none; }
+.p-name { color: var(--tx); }
+.p-tel  { font-size: 11px; color: var(--tx3); margin-left: 6px; }
+.p-role {
+  font-size: 10px; padding: 2px 8px; border-radius: 4px;
+  background: #fff; color: var(--tx2); border: 1px solid var(--border);
+  white-space: nowrap; flex-shrink: 0;
+}
+.p-role.student { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); }
+.p-role.parent  { color: #8B5CF6; border-color: #C4B5FD; background: #F5F3FF; }
+
+/* ── Button ── */
+.btn {
+  display: inline-flex; align-items: center;
+  padding: 12px 28px; background: var(--tx); color: #fff;
+  border-radius: 100px; cursor: pointer; font-size: 14px; font-weight: 500;
+  border: none; transition: transform .2s, box-shadow .2s;
+  font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased;
+}
+.btn:hover  { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+.btn:active { transform: translateY(0); }
+.btn-ghost  {
+  background: transparent; color: var(--tx2);
+  border: 1px solid var(--border); margin-top: 12px;
+}
+.btn-ghost:hover { background: var(--surface2); box-shadow: none; transform: none; }
+
+#fileInput { display: none; }
+.foot { margin-top: 40px; font-size: 10px; color: var(--tx3); letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">HUN STUDIO</div>
+  <h1 class="title"><span>HUN</span> vCard</h1>
+  <p class="desc">
+    연락처 파일을 드롭하여 변환하세요
+    <span style="color:var(--border)">|</span>
+    <a class="sample-link" onclick="downloadSample(event)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      샘플 받기
+    </a>
+  </p>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="dz" id="dz">
+      <div class="dz-border"></div>
+
+      <!-- IDLE -->
+      <div id="view-idle">
+        <div style="font-size:17px;font-weight:600;margin-bottom:6px;letter-spacing:-0.02em;">파일을 선택하세요</div>
+        <div style="font-size:13px;color:var(--tx3);font-weight:300;">Excel 또는 CSV 형식 지원</div>
+      </div>
+
+      <!-- PROCESSING -->
+      <div id="view-proc" style="display:none;">
+        <div class="prog-container">
+          <div style="font-size:14px;font-weight:500;letter-spacing:-0.01em;">연락처 분석 중…</div>
+          <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+          <div class="prog-count" id="prog-count">준비 중</div>
+        </div>
+      </div>
+
+      <!-- DONE -->
+      <div id="view-done" style="display:none;">
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px;letter-spacing:-0.02em;">변환 완료</div>
+        <div id="done-filename" style="font-size:12px;color:var(--tx3);margin-bottom:16px;"></div>
+
+        <div class="stats">
+          <div class="stat"><div class="stat-n" id="stat-total">0</div><div class="stat-l">전체 건수</div></div>
+          <div class="stat"><div class="stat-n" id="stat-student">0</div><div class="stat-l">학생</div></div>
+          <div class="stat"><div class="stat-n" id="stat-parent">0</div><div class="stat-l">학부모</div></div>
+        </div>
+
+        <div class="preview-area">
+          <div class="preview-label">Data Preview</div>
+          <div class="preview-list" id="preview-list"></div>
+        </div>
+
+        <button class="btn btn-ghost" onclick="toIdle()">새 파일 변환</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".xlsx,.xls,.csv"/>
+<div class="foot">DESIGNED BY HUN · 2026</div>
+
+<script>
+const COL = { name:'성명', school:'학교', student:'학생핸드폰', parent:'부모핸드폰' }
+const dz        = document.getElementById('dz')
+const fileInput = document.getElementById('fileInput')
+let   state     = 'idle'
+
+function show(id) {
+  ['view-idle','view-proc','view-done'].forEach(v =>
+    document.getElementById(v).style.display = (v === id ? '' : 'none')
+  )
+  state = id
+  dz.classList.toggle('proc', id === 'view-proc')
+}
+
+function toIdle() { show('view-idle'); dz.classList.remove('drag') }
+
+// ── 이벤트 ──────────────────────────────────────────────────────────────
+dz.addEventListener('dragover',  e => { e.preventDefault(); if (state !== 'view-proc') dz.classList.add('drag') })
+dz.addEventListener('dragleave', e => { if (!dz.contains(e.relatedTarget)) dz.classList.remove('drag') })
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag')
+  if (state === 'view-proc') return
+  const f = e.dataTransfer.files[0]; if (f) handleFile(f)
+})
+dz.addEventListener('click', () => { if (state !== 'view-proc') fileInput.click() })
+fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); fileInput.value = '' })
+
+// ── 샘플 파일 ────────────────────────────────────────────────────────────
+function downloadSample(e) {
+  e.stopPropagation()
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['성명','학교','학생핸드폰','부모핸드폰'],
+    ['홍길동','갈무리중학교','010-1234-5678','010-1111-2222'],
+    ['김철수','갈무리고등학교','010-2222-3333','010-4444-5555'],
+    ['이영희','갈무리어학당','','010-6666-7777'],
+  ])
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Sample')
+  XLSX.writeFile(wb, 'HUN_Contact_Sample.xlsx')
+}
+
+// ── 정규화 & vCard 빌드 ──────────────────────────────────────────────────
+function normTel(v) { return String(v ?? '').replace(/[^0-9]/g, '') }
+
+function buildCard(displayName, tel) {
+  const parts = displayName.split(' ')
+  const last  = parts[0] || ''
+  const first = parts.slice(1).join(' ')
+  return [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    'FN;CHARSET=UTF-8:'  + displayName,
+    'N;CHARSET=UTF-8:'   + last + ';' + first + ';;;',
+    'TEL;TYPE=CELL:'     + tel,
+    'END:VCARD',
+  ].join('\r\n')
+}
+
+// ── 미리보기 ─────────────────────────────────────────────────────────────
+function addPreview(name, tel, role) {
+  const div = document.createElement('div')
+  div.className = 'preview-item'
+  const isStudent = role === '학생'
+  div.innerHTML =
+    `<span><span class="p-name">${name}</span><span class="p-tel">${tel}</span></span>` +
+    `<span class="p-role ${isStudent ? 'student' : 'parent'}">${role}</span>`
+  document.getElementById('preview-list').appendChild(div)
+}
+
+// ── 파일 처리 ────────────────────────────────────────────────────────────
+function handleFile(file) {
+  if (!file) return
+  document.getElementById('preview-list').innerHTML = ''
+  show('view-proc')
+
+  const reader = new FileReader()
+  reader.onload = e => {
+    try {
+      const wb  = XLSX.read(new Uint8Array(e.target.result), { type:'array', codepage:65001 })
+      const all = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header:1, defval:'' })
+
+      let hi = all.findIndex(r => r.some(c => String(c).trim() === COL.name))
+      if (hi === -1) hi = 0
+      const headers  = all[hi].map(c => String(c).trim())
+      const dataRows = all.slice(hi + 1)
+      const base     = file.name.replace(/\.[^.]+$/, '')
+
+      processData(dataRows, headers, base)
+    } catch(ex) {
+      show('view-idle')
+      alert('파일 파싱 오류: ' + ex.message)
+    }
+  }
+  reader.readAsArrayBuffer(file)
+}
+
+// ── 청크 단위 처리 + 진행바 ─────────────────────────────────────────────
+function processData(dataRows, headers, base) {
+  const CHUNK = 30
+  let idx = 0, sc = 0, pc = 0
+  const cards = []
+  const total = dataRows.length || 1
+
+  function setProgress(done) {
+    const pct = Math.round((done / total) * 100)
+    document.getElementById('prog-fill').style.width  = pct + '%'
+    document.getElementById('prog-count').textContent = done + ' / ' + total + ' 행'
+  }
+
+  function tick() {
+    const end = Math.min(idx + CHUNK, dataRows.length)
+    while (idx < end) {
+      const raw = dataRows[idx++]
+      const row = {}
+      headers.forEach((h, i) => { row[h] = String(raw[i] ?? '').trim() })
+
+      const name = row[COL.name]
+      const sp   = normTel(row[COL.student])
+      const pp   = normTel(row[COL.parent])
+      if (!name) continue
+
+      if (sp) { cards.push(buildCard(name, sp));                        addPreview(name, sp, '학생');   sc++ }
+      if (pp) { cards.push(buildCard(name + ' 부모님', pp));            addPreview(name + ' 부모님', pp, '학부모'); pc++ }
+      setProgress(idx)
+    }
+    if (idx < dataRows.length) {
+      setTimeout(tick, 0)
+    } else {
+      setProgress(total)
+      setTimeout(() => finish(cards, sc, pc, base), 100)
+    }
+  }
+
+  setProgress(0)
+  setTimeout(tick, 0)
+}
+
+// ── 완료 ─────────────────────────────────────────────────────────────────
+function finish(cards, sc, pc, base) {
+  if (!cards.length) {
+    show('view-idle')
+    alert('변환된 연락처가 없어요.\n성명 · 학생핸드폰 · 부모핸드폰 컬럼을 확인해주세요.')
+    return
+  }
+
+  const blob = new Blob(['\uFEFF' + cards.join('\r\n\r\n')], { type:'text/vcard;charset=utf-8' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = base + '_HUN.vcf'; a.click()
+  URL.revokeObjectURL(url)
+
+  document.getElementById('stat-total').textContent   = sc + pc
+  document.getElementById('stat-student').textContent = sc
+  document.getElementById('stat-parent').textContent  = pc
+  document.getElementById('done-filename').textContent = base + '_HUN.vcf'
+  show('view-done')
+}
+</script>
+</body>
+</html>
