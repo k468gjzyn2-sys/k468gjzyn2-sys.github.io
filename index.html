@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <style>
-/* 디자인 시스템 */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #F5F5F7; --surface: #FFFFFF; --surface2: #F5F5F7; --border: #E0E0E5;
@@ -19,7 +18,6 @@
 }
 body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--tx); -webkit-font-smoothing: antialiased; }
 
-/* 헤더 */
 .header { text-align: center; margin-bottom: 40px; }
 .badge { display: inline-block; padding: 5px 14px; background: var(--tx); color: #fff; font-size: 10px; font-weight: 700; border-radius: 100px; margin-bottom: 16px; letter-spacing: 0.1em; }
 .title { font-size: 36px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 8px; line-height: 1.15; }
@@ -27,7 +25,6 @@ body { min-height: 100vh; display: flex; flex-direction: column; align-items: ce
 .desc { font-size: 15px; font-weight: 300; color: var(--tx2); display: flex; align-items: center; justify-content: center; gap: 8px; }
 .sample-link { font-size: 12px; color: var(--accent); text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; transition: opacity .2s; font-weight: 500; }
 
-/* 카드 및 드롭존 */
 .wrap { width: 100%; max-width: 500px; }
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
 .dz { position: relative; padding: 60px 30px; text-align: center; cursor: pointer; transition: background .25s ease; user-select: none; }
@@ -37,7 +34,6 @@ body { min-height: 100vh; display: flex; flex-direction: column; align-items: ce
 .dz:hover .dz-border { opacity: 1; }
 .dz.drag .dz-border { opacity: 1; border-color: var(--accent); }
 
-/* 결과창 및 미리보기 */
 .stats { display: flex; gap: 8px; margin: 20px 0; }
 .stat { background: var(--surface2); padding: 12px; border-radius: var(--radius-sm); flex: 1; text-align: center; }
 .stat-n { font-size: 22px; font-weight: 700; color: var(--tx); }
@@ -49,9 +45,14 @@ body { min-height: 100vh; display: flex; flex-direction: column; align-items: ce
 .p-role.student { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); }
 .p-role.warning { color: #fff; border-color: var(--accent); background: var(--accent); font-weight: 600; }
 
-/* 진행바 */
+/* 감지 결과 배지 */
+.col-map-info { background: var(--accent-bg); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 11px; color: var(--tx2); margin-bottom: 12px; line-height: 1.7; border: 1px solid rgba(255,158,0,0.2); }
+.col-map-info strong { color: var(--accent-dk); }
+
 .prog-track { width: 100%; height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; margin-top: 15px; }
-.prog-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s; }
+.prog-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.15s; }
+
+.error-box { background: #FFF2F2; border: 1px solid #FFCDD2; border-radius: var(--radius-sm); padding: 14px 16px; font-size: 13px; color: #C62828; margin-top: 12px; line-height: 1.6; }
 
 .btn { display: inline-flex; align-items: center; padding: 12px 28px; background: var(--accent); color: #fff; border-radius: 100px; border: none; cursor: pointer; font-weight: 600; margin-top: 12px; }
 .btn-ghost { background: transparent; color: var(--tx2); border: 1px solid var(--border); }
@@ -73,7 +74,7 @@ body { min-height: 100vh; display: flex; flex-direction: column; align-items: ce
       <div class="dz-border"></div>
       <div id="view-idle">
         <div style="font-size:17px; font-weight:600; margin-bottom:6px;">여기에 엑셀 파일을 놓아주세요</div>
-        <div style="font-size:13px; color:var(--tx3);">모든 시트를 자동으로 통합하여 변환합니다.</div>
+        <div style="font-size:13px; color:var(--tx3);">컬럼명이 달라도 자동으로 인식합니다.</div>
       </div>
       <div id="view-proc" style="display:none;">
         <div style="font-size:14px; font-weight:500;">연락처 분석 중…</div>
@@ -83,19 +84,25 @@ body { min-height: 100vh; display: flex; flex-direction: column; align-items: ce
       <div id="view-done" style="display:none;">
         <div style="font-size:18px; font-weight:700; margin-bottom:4px;">변환 완료 🎉</div>
         <div id="done-filename" style="font-size:12px; color:var(--tx3); margin-bottom:16px;"></div>
+        <div id="col-map-info" class="col-map-info" style="display:none;"></div>
         <div class="stats">
           <div class="stat"><div class="stat-n" id="stat-total">0</div><div class="stat-l">전체 건수</div></div>
           <div class="stat"><div class="stat-n" id="stat-student">0</div><div class="stat-l">학생</div></div>
           <div class="stat"><div class="stat-n" id="stat-parent">0</div><div class="stat-l">학부모</div></div>
         </div>
         <div class="preview-area" style="text-align:left;">
-          <div id="warn-label" style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:8px; display:none;">⚠️ 별도 저장 필요 확인</div>
+          <div id="warn-label" style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:8px; display:none;"></div>
           <div class="preview-list" id="preview-list"></div>
           <div style="margin-top:10px; padding:10px; background:var(--accent-bg); border-radius:8px; font-size:11px; color:var(--tx2); line-height:1.5;">
             💡 미리보기는 최대 100개만 표시됩니다. <strong>가져오기 클릭 시 전체 인원이 정상 저장됩니다.</strong>
           </div>
         </div>
         <button class="btn btn-ghost" onclick="location.reload()">새 파일 변환</button>
+      </div>
+      <div id="view-error" style="display:none; text-align:left;">
+        <div style="font-size:16px; font-weight:700; margin-bottom:8px; text-align:center;">인식 실패 😥</div>
+        <div id="error-msg" class="error-box"></div>
+        <div style="text-align:center;"><button class="btn btn-ghost" onclick="location.reload()">다시 시도</button></div>
       </div>
     </div>
   </div>
@@ -105,12 +112,80 @@ body { min-height: 100vh; display: flex; flex-direction: column; align-items: ce
 <div class="foot">DESIGNED BY HUN · 2026</div>
 
 <script>
-// 컬럼 감지 후보
-const CANDIDATES = {
-  name: ['학생명', '성명', '이름', '학생이름'],
-  student: ['학생핸드폰', '학생번호', '학생연락처', '핸드폰', '연락처'],
-  parent: ['학부모핸드폰', '학부모번호', '부모핸드폰', '부모번호', '보호자번호']
+// ── 패턴 ──────────────────────────────────────────────
+const PHONE_RE = /0\d{1,2}[\-\s]?\d{3,4}[\-\s]?\d{4}/;
+const KOREAN_NAME_RE = /^[가-힣]{2,5}$/;
+
+// 헤더명 힌트 (공백 무시, 소문자 비교)
+const HINTS = {
+  name:    ['학생명','성명','이름','학생이름','name'],
+  student: ['학생핸드폰','학생번호','학생연락처','학생폰','학생휴대폰','본인번호','본인연락처','본인핸드폰'],
+  parent:  ['학부모핸드폰','학부모번호','학부모연락처','부모핸드폰','부모번호','보호자번호','보호자연락처','어머니번호','아버지번호','부번호','모번호']
 };
+// 학생/부모 구분 없이 그냥 전화번호일 때
+const PHONE_GENERIC = ['핸드폰','연락처','휴대폰','전화번호','tel','phone','mobile'];
+
+// ── 컬럼 자동 감지 ────────────────────────────────────
+function detectColumns(headers, dataRows) {
+  const sample = dataRows.slice(0, 30);
+
+  // 각 열에 대해 점수 계산
+  const cols = headers.map((h, i) => {
+    const key = h.replace(/\s/g, '').toLowerCase();
+    let nameScore = 0, studentScore = 0, parentScore = 0, phoneScore = 0;
+
+    // 1) 헤더명 힌트 점수
+    if (HINTS.name.some(k => key.includes(k.replace(/\s/g,'').toLowerCase())))   nameScore   += 10;
+    if (HINTS.student.some(k => key.includes(k.replace(/\s/g,'').toLowerCase()))) studentScore += 10;
+    if (HINTS.parent.some(k => key.includes(k.replace(/\s/g,'').toLowerCase())))  parentScore  += 10;
+    if (PHONE_GENERIC.some(k => key.includes(k))) phoneScore += 3;
+
+    // 2) 실제 데이터 패턴 점수
+    sample.forEach(row => {
+      const val = String(row[i] ?? '').trim();
+      if (!val) return;
+      if (PHONE_RE.test(val))     phoneScore   += 1;
+      if (KOREAN_NAME_RE.test(val)) nameScore  += 1;
+    });
+
+    return { i, header: h, nameScore, studentScore, parentScore, phoneScore };
+  });
+
+  // 이름 열: nameScore 최고
+  const nameCol = [...cols].sort((a,b) => b.nameScore - a.nameScore)[0];
+  if (nameCol.nameScore < 1) return null; // 이름 열 못 찾으면 실패
+
+  // 전화번호 열 후보: 이름 열 제외, phoneScore > 0
+  const phoneCols = cols
+    .filter(c => c.i !== nameCol.i && (c.phoneScore > 0 || c.studentScore > 0 || c.parentScore > 0))
+    .sort((a, b) => (b.studentScore + b.phoneScore) - (a.studentScore + a.phoneScore));
+
+  if (phoneCols.length === 0) return null;
+
+  // 학생/학부모 열 결정
+  // 명시적 힌트가 있으면 그걸 우선
+  let studentCol = phoneCols.find(c => c.studentScore >= 10);
+  let parentCol  = phoneCols.find(c => c.parentScore  >= 10);
+
+  // 힌트 없으면 phoneScore 순으로 첫 번째 = 학생, 두 번째 = 학부모
+  if (!studentCol && phoneCols.length >= 1) studentCol = phoneCols[0];
+  if (!parentCol  && phoneCols.length >= 2) parentCol  = phoneCols[1];
+
+  // 학생=학부모가 같은 열이 되면 학부모 없음
+  if (parentCol && parentCol.i === studentCol?.i) parentCol = null;
+
+  return {
+    name:    nameCol.i,
+    student: studentCol?.i ?? null,
+    parent:  parentCol?.i  ?? null,
+    nameHeader:    nameCol.header,
+    studentHeader: studentCol?.header ?? '—',
+    parentHeader:  parentCol?.header  ?? '—',
+  };
+}
+
+// ── 유틸 ──────────────────────────────────────────────
+function normTel(v) { return String(v ?? '').replace(/[^0-9]/g, ''); }
 
 const dz = document.getElementById('dz');
 const fileInput = document.getElementById('fileInput');
@@ -123,73 +198,151 @@ fileInput.onchange = e => { if(e.target.files[0]) handleFile(e.target.files[0]);
 
 function downloadSample(e) {
   e.stopPropagation();
-  const ws = XLSX.utils.aoa_to_sheet([['학생명', '학생핸드폰', '학부모핸드폰'], ['홍길동', '010-1234-5678', '010-1111-2222'], ['성춘향', '010-2222-3333', '010-4444-5555 / 010-6666-7777']]);
-  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Sample');
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['학생명', '학생핸드폰', '학부모핸드폰'],
+    ['홍길동', '010-1234-5678', '010-1111-2222'],
+    ['성춘향', '010-2222-3333', '010-4444-5555 / 010-6666-7777']
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sample');
   XLSX.writeFile(wb, 'Galmuri_Contact_Sample.xlsx');
 }
 
-function normTel(v) { return String(v ?? '').replace(/[^0-9]/g, ''); }
+function showError(msg) {
+  document.getElementById('view-proc').style.display = 'none';
+  document.getElementById('view-idle').style.display = 'none';
+  document.getElementById('error-msg').innerHTML = msg;
+  document.getElementById('view-error').style.display = 'block';
+}
 
+// ── 파일 처리 ─────────────────────────────────────────
 function handleFile(file) {
   if (!file) return;
   document.getElementById('view-idle').style.display = 'none';
   document.getElementById('view-proc').style.display = 'block';
+
   const reader = new FileReader();
+  reader.onerror = () => showError('파일을 읽는 중 오류가 발생했습니다.');
   reader.onload = e => {
-    const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-    let allRows = [];
-    wb.SheetNames.forEach(name => {
-      const raw = XLSX.utils.sheet_to_json(wb.Sheets[name], {header:1, defval:''});
-      const hi = raw.findIndex(r => r.some(c => CANDIDATES.name.includes(String(c).trim())));
-      if (hi === -1) return;
-      const headers = raw[hi].map(c => String(c).trim());
-      raw.slice(hi + 1).forEach(r => {
-        const row = {}; headers.forEach((h, i) => row[h] = r[i]); allRows.push(row);
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      let allRows = [];   // [{colIndex: value, ...}] 형태 대신 배열 행으로
+      let rawRows = [];
+      let detectedMap = null;
+      let headers = [];
+
+      wb.SheetNames.forEach(sheetName => {
+        const raw = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: '' });
+        if (raw.length < 2) return;
+
+        // 헤더 행 탐색: 이름 패턴이나 힌트 키워드가 있는 행
+        let hi = -1;
+        for (let r = 0; r < Math.min(raw.length, 10); r++) {
+          const rowStr = raw[r].map(c => String(c).replace(/\s/g,'').toLowerCase()).join('|');
+          const hasNameHint = HINTS.name.some(k => rowStr.includes(k.replace(/\s/g,'').toLowerCase()));
+          const hasPhoneHint = [...HINTS.student, ...HINTS.parent, ...PHONE_GENERIC]
+            .some(k => rowStr.includes(k.replace(/\s/g,'').toLowerCase()));
+          if (hasNameHint || hasPhoneHint) { hi = r; break; }
+        }
+        if (hi === -1) return; // 이 시트는 스킵
+
+        const sheetHeaders = raw[hi].map(c => String(c).trim());
+        const sheetDataRows = raw.slice(hi + 1);
+
+        // 컬럼 감지 (첫 번째 성공한 시트 기준)
+        if (!detectedMap) {
+          detectedMap = detectColumns(sheetHeaders, sheetDataRows);
+          headers = sheetHeaders;
+        }
+
+        sheetDataRows.forEach(row => allRows.push(row));
       });
-    });
-    processData(allRows, file.name.split('.')[0]);
+
+      if (!detectedMap) {
+        showError(
+          '연락처 컬럼을 자동으로 찾지 못했습니다.<br><br>' +
+          '• 이름, 학생번호, 학부모번호가 포함된 시트인지 확인해주세요.<br>' +
+          '• 헤더(첫 행)가 병합 셀로 되어 있으면 해제해주세요.<br>' +
+          '• 샘플 파일을 참고해서 양식을 확인해보세요.'
+        );
+        return;
+      }
+
+      processData(allRows, detectedMap, file.name.replace(/\.[^.]+$/, ''));
+    } catch(err) {
+      showError('파일 파싱 오류: ' + err.message);
+    }
   };
   reader.readAsArrayBuffer(file);
 }
 
-function processData(rows, base) {
-  let sc = 0, pc = 0, wc = 0, cards = [];
-  const preview = document.getElementById('preview-list');
-  preview.innerHTML = '';
+// ── 데이터 처리 (청크 방식으로 setTimeout 루프 버그 수정) ──
+function processData(rows, map, base) {
+  const cards = [];
+  let sc = 0, pc = 0, wc = 0;
+  let previewCount = 0;
+  const CHUNK = 50;
+  let cursor = 0;
 
-  rows.forEach((row, i) => {
-    setTimeout(() => {
-      const h_name = CANDIDATES.name.find(k => row[k]);
-      const h_student = CANDIDATES.student.find(k => row[k]);
-      const h_parent = CANDIDATES.parent.find(k => row[k]);
-      
-      const name = row[h_name];
-      if (!name) return;
+  // 감지된 컬럼 정보 표시
+  const mapInfo = document.getElementById('col-map-info');
+  mapInfo.innerHTML =
+    `🔍 자동 감지 결과 — ` +
+    `<strong>이름:</strong> ${map.nameHeader} &nbsp;` +
+    `<strong>학생:</strong> ${map.studentHeader} &nbsp;` +
+    `<strong>학부모:</strong> ${map.parentHeader}`;
 
-      const sTel = normTel(row[h_student]);
-      const pRaw = String(row[h_parent] ?? '').split(/[/,]/).map(v => normTel(v)).filter(v => v.length >= 9);
+  function processChunk() {
+    const end = Math.min(cursor + CHUNK, rows.length);
+    for (let i = cursor; i < end; i++) {
+      const row = rows[i];
+      const name = String(row[map.name] ?? '').trim();
+      if (!name) continue;
 
-      if (sTel) {
-        cards.push(`BEGIN:VCARD\r\nVERSION:3.0\r\nFN;CHARSET=UTF-8:${name}\r\nN;CHARSET=UTF-8:;${name};;;\r\nTEL;TYPE=CELL:${sTel}\r\nEND:VCARD`);
+      const sTel = map.student !== null ? normTel(row[map.student]) : '';
+      const pRaw = map.parent !== null
+        ? String(row[map.parent] ?? '').split(/[/,；;]/).map(v => normTel(v)).filter(v => v.length >= 9)
+        : [];
+
+      if (sTel && sTel.length >= 9) {
+        cards.push(makeVCard(name, sTel));
         sc++;
-        if (sc + pc + wc <= 100) addPreview(name, sTel, '학생', 'student');
+        if (previewCount < 100) { addPreview(name, formatTel(sTel), '학생', 'student'); previewCount++; }
       }
 
       if (pRaw.length >= 2) {
         wc++;
-        addPreview(name, pRaw.join(' / '), '별도 저장 필요', 'warning', true);
+        if (previewCount < 100) { addPreview(name, pRaw.map(formatTel).join(' / '), '별도 저장 필요', 'warning', true); previewCount++; }
       } else if (pRaw[0]) {
-        cards.push(`BEGIN:VCARD\r\nVERSION:3.0\r\nFN;CHARSET=UTF-8:${name} 부모님\r\nN;CHARSET=UTF-8:;${name} 부모님;;;\r\nTEL;TYPE=CELL:${pRaw[0]}\r\nEND:VCARD`);
+        cards.push(makeVCard(name + ' 부모님', pRaw[0]));
         pc++;
-        if (sc + pc + wc <= 100) addPreview(name + ' 부모님', pRaw[0], '학부모', 'parent');
+        if (previewCount < 100) { addPreview(name + ' 부모님', formatTel(pRaw[0]), '학부모', 'parent'); previewCount++; }
       }
+    }
 
-      const pct = Math.round(((i + 1) / rows.length) * 100);
-      document.getElementById('prog-fill').style.width = pct + '%';
-      document.getElementById('prog-count').textContent = `${i + 1} / ${rows.length} 행`;
-      if (i === rows.length - 1) finish(cards, sc, pc, wc, base);
-    }, i * 2);
-  });
+    cursor = end;
+    const pct = Math.round((cursor / rows.length) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-count').textContent = `${cursor} / ${rows.length} 행`;
+
+    if (cursor < rows.length) {
+      requestAnimationFrame(processChunk);
+    } else {
+      finish(cards, sc, pc, wc, base);
+    }
+  }
+
+  processChunk();
+}
+
+function makeVCard(name, tel) {
+  return `BEGIN:VCARD\r\nVERSION:3.0\r\nFN;CHARSET=UTF-8:${name}\r\nN;CHARSET=UTF-8:;${name};;;\r\nTEL;TYPE=CELL:${tel}\r\nEND:VCARD`;
+}
+
+function formatTel(digits) {
+  if (digits.length === 11) return digits.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+  if (digits.length === 10) return digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+  return digits;
 }
 
 function addPreview(name, tel, role, cls, warn = false) {
@@ -201,18 +354,24 @@ function addPreview(name, tel, role, cls, warn = false) {
 
 function finish(cards, sc, pc, wc, base) {
   if (cards.length) {
-    const blob = new Blob(['\uFEFF' + cards.join('\r\n\r\n')], {type:'text/vcard;charset=utf-8'});
+    const blob = new Blob(['\uFEFF' + cards.join('\r\n\r\n')], { type: 'text/vcard;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${base}_갈무리.vcf`; a.click();
+    const a = document.createElement('a');
+    a.href = url; a.download = `${base}_갈무리.vcf`; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000); // 메모리 해제
   }
+
   document.getElementById('stat-total').textContent = sc + pc;
   document.getElementById('stat-student').textContent = sc;
   document.getElementById('stat-parent').textContent = pc;
+
   if (wc > 0) {
     const wl = document.getElementById('warn-label');
-    wl.textContent = `⚠️ 별도 저장 필요: ${wc}건`; wl.style.display = 'block';
+    wl.textContent = `⚠️ 번호가 2개 이상인 학부모 ${wc}건은 별도로 저장해주세요`;
+    wl.style.display = 'block';
   }
   document.getElementById('done-filename').textContent = `${base}_갈무리.vcf`;
+  document.getElementById('col-map-info').style.display = 'block';
   document.getElementById('view-proc').style.display = 'none';
   document.getElementById('view-done').style.display = 'block';
 }
